@@ -19,4 +19,4 @@ $ pip install -r requirements.txt
 
 ## References
 
-[1] Tian Xie and Jeffrey C Grossman. Crystal Graph Convolutional Neural Networks for an Accurate and Interpretable Prediction of Material Properties. Physical review letters, 120(14):145301, 2018.
+[1] Juhwan Noh and Jaehoon Kim and Helge S. Stein and Benjamin Sanchez-Lengeling and John M. Gregoire and Alan Aspuru-Guzik and Yousung Jung. Inverse Design of Solid-State Materials via a Continuous Representation. _Matter_, 2590-2385, 2019.
