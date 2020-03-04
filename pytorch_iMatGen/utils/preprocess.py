@@ -48,6 +48,7 @@ def get_all_atomlabel(all_atomlist=None):
     all_atomindex = {}
     for i, symbol in enumerate(all_atomlist):
         all_atomindex[symbol] = i
+
     return all_atomlist, all_atomindex
 
 
@@ -63,10 +64,10 @@ def ase_atoms_to_image(ase_atoms, nbins, all_atomlist, num_cores):
     for i, atom in enumerate(ase_atoms):
         channel = all_atomindex[atom.symbol]
         channellist.append(channel)
+
     channellist = list(set(channellist))
     nc = len(channellist)
-    shape = (nbins, nbins, nbins, nc)
-    image = np.zeros(shape)
+    image = np.zeros((nbins, nbins, nbins, nc))
     for i, atom in enumerate(ase_atoms):
         nnc = channellist.index(all_atomindex[atom.symbol])
         img_i = imageall_list[i]

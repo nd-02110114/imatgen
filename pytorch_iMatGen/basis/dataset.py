@@ -1,28 +1,29 @@
-import random
+import torch
 import functools
+import numpy as np
 from torch.utils.data import Dataset
 from pymatgen.io.ase import AseAtomsAdaptor
 from pymatgen.core.structure import Structure
 
 
-from utils.preprocess import cell_translate, ase_atoms_to_image
+from utils.preprocess import basis_translate, ase_atoms_to_image
 
 
-def cif_to_cell_image(position_info, nbins, all_atomlist, num_cores, fmt='cif'):
+def cif_to_basis_image(position_info, nbins, all_atomlist, num_cores, fmt='cif'):
     crystal = Structure.from_str(position_info, fmt)
     ase_atoms = AseAtomsAdaptor.get_atoms(crystal)
-    translated_ase_atoms = cell_translate(ase_atoms)
+    translated_ase_atoms = basis_translate(ase_atoms)
     image, channellist = ase_atoms_to_image(translated_ase_atoms, nbins, all_atomlist, num_cores)
-    return image
+    return image, channellist
 
 
-class CellImageDataWrapper(Dataset):
+class BasisImageDataset(Dataset):
     """
     Wrapper for a dataset
     """
 
-    def __init__(self, cifs, table, transform=cif_to_cell_image,
-                 nbins=32, allatom_list=None, num_cores=1, fmt='cif',
+    def __init__(self, cifs, table, transform=cif_to_basis_image,
+                 nbins=64, allatom_list=None, num_cores=-1, fmt='cif',
                  random_seed=123):
         """
         Args:
@@ -37,8 +38,6 @@ class CellImageDataWrapper(Dataset):
             random_seed (int): Random seed for shuffling the dataset.
         """
         self.mp_ids = table['material_id'].values
-        random.seed(random_seed)
-        random.shuffle(self.mp_ids)
         self.cifs = cifs
         self.transform = transform
         self.nbins = nbins
@@ -52,6 +51,8 @@ class CellImageDataWrapper(Dataset):
     @functools.lru_cache(maxsize=None)  # Cache loaded structures
     def __getitem__(self, idx):
         mp_id = self.mp_ids[idx]
-        image = self.transform(self.cifs[mp_id].value, self.nbins,
-                               self.allatom_list, self.num_cores, self.fmt)
-        return image
+        image, channellist = self.transform(self.cifs[mp_id].value, self.nbins,
+                                            self.allatom_list, self.num_cores, self.fmt)
+        image = np.transpose(image, (3, 0, 1, 2))
+        print(image.shape)
+        return torch.tensor(image, dtype=torch.float), channellist

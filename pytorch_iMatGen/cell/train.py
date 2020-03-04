@@ -1,0 +1,99 @@
+import json
+import h5py
+import argparse
+import torch
+import pandas as pd
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from os import path, makedirs, getcwd
+from sklearn.model_selection import train_test_split
+
+
+from utils.seed import seed_everything
+from utils.runner import AutoEncoderRunner
+from cell.model import CellAutoEncoder
+from cell.dataset import CellImageDataset
+from cell.loss import Reconstruction
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Training VAE for getting cell images')
+    # for data
+    parser.add_argument('--cif-path', default='dataset/data_2020_03_03.h5',
+                        type=str, help='path to cif data (relative path)')
+    parser.add_argument('--csv-path', default='dataset/data_2020_03_03.csv',
+                        type=str, help='path to csv data (relative path)')
+    parser.add_argument('--out-dir', '-o', default='result',
+                        type=str, help='path for output directory')
+    # usual setting
+    parser.add_argument('--train-ratio', default=0.9, type=float,
+                        help='percentage of train data to be loaded (0.9)')
+    parser.add_argument('--test-ratio', default=0.1, type=float,
+                        help='percentage of test data to be loaded (0.1)')
+
+    # for model
+    parser.add_argument('--z-size', default=20, type=int, help='size for latent variable (200)')
+
+    # for learning
+    parser.add_argument('--gpu', '-g', action='store_true',
+                        help='using gpu during training')
+    parser.add_argument('--epochs', '-e', default=21, type=int,
+                        help='number of total epochs to run (21)')
+    parser.add_argument('--batch-size', '-b', default=32, type=int,
+                        help='mini-batch size (32)')
+    parser.add_argument('--learning-rate', '-lr', default=0.0001, type=float,
+                        help='initial learning rate (default: 0.0001')
+    parser.add_argument('--optim', choices=['SGD', 'Adam'], default='Adam',
+                        help='choose an optimizer, SGD or Adam, (default: Adam)')
+    parser.add_argument('--seed', default=1234, type=int, help='seed value (default: 1234)')
+
+    return parser.parse_args()
+
+
+def main():
+    # get args
+    args = parse_arguments()
+
+    # make output directory
+    out_dir = args.out_dir
+    out_dir_path = path.normpath(path.join(getcwd(), out_dir))
+    makedirs(out_dir_path, exist_ok=True)
+    # save the parameter
+    with open(path.join(out_dir_path, 'params.json'), mode="w") as f:
+        json.dump(args.__dict__, f, indent=4)
+
+    # setup
+    seed_everything(args.seed)
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+    # load raw dataset
+    cif_path = path.normpath(path.join(getcwd(), args.cif_path))
+    csv_path = path.normpath(path.join(getcwd(), args.csv_path))
+    cif_data = h5py.File(cif_path, "r")
+    table_data = pd.read_csv(csv_path, index_col=False)
+
+    # split
+    train_data, test_data = train_test_split(table_data, test_size=args.test_ratio, random_state=args.seed)
+    # setup data loader
+    train_dataset = CellImageDataset(cif_data, train_data)
+    test_dataset = CellImageDataset(cif_data, test_data)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    valid_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+    loaders = {'train': train_loader, 'valid': valid_loader}
+
+    # train
+    model = CellAutoEncoder(z_size=args.z_size)
+    model = model.to(device)
+    optimizer = Adam(model.parameters(), lr=args.learning_rate)
+    criterion = Reconstruction()
+    scheduler = None
+
+    # runner
+    runner = AutoEncoderRunner(device=device)
+    # model training
+    runner.train(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler,
+                 loaders=loaders, logdir=args.out_dir, num_epochs=args.epochs)
+
+
+if __name__ == '__main__':
+    main()
