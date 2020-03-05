@@ -18,11 +18,11 @@ from cell.loss import Reconstruction
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Training AE for cell images')
     # for data
-    parser.add_argument('--data-path', default='dataset/preprocess/mp_dataset_2020_03',
+    parser.add_argument('--data-path', default='../dataset/preprocess/mp_dataset_2020_03',
                         type=str, help='path to preprocessed data (relative path)')
-    parser.add_argument('--csv-path', default='dataset/raw/data_2020_03_03.csv',
+    parser.add_argument('--csv-path', default='../dataset/raw/data_2020_03_03.csv',
                         type=str, help='path to csv data (relative path)')
-    parser.add_argument('--out-dir', '-o', default='result/cell',
+    parser.add_argument('--out-dir', '-o', default='result',
                         type=str, help='path for output directory')
     # usual setting
     parser.add_argument('--train-ratio', default=0.9, type=float,
