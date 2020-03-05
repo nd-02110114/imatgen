@@ -24,7 +24,7 @@ def get_fakeatoms_positioning_in_the_grid(atoms, nbins):
 
 def get_scale(sigma):
     """Get a scale for images"""
-    scale = 1.0 / (2 * sigma**2)
+    scale = 1.0 / (2 * sigma ** 2)
     return scale
 
 
@@ -35,7 +35,7 @@ def get_image_one_atom(atom, fakeatoms_grid, nbins):
     grid_copy.append(atom)
     drijk = grid_copy.get_distances(-1, range(0, nbins**3), mic=True)
     scale = get_scale(sigma=0.26)
-    pijk = np.exp(-scale * drijk**2)
+    pijk = np.exp(-scale * drijk ** 2)
     image[:, :] = pijk.flatten()
     return image.reshape(nbins, nbins, nbins)
 
@@ -45,31 +45,28 @@ def get_all_atomlabel(all_atomlist=None):
     if all_atomlist is None:
         all_atomlist = list(set(MP_ATOMLIST + COD_ATOMLIST))
 
-    all_atomindex = {}
-    for i, symbol in enumerate(all_atomlist):
-        all_atomindex[symbol] = i
-
-    return all_atomlist, all_atomindex
+    all_atomlist = sorted(all_atomlist)
+    return all_atomlist
 
 
 def ase_atoms_to_image(ase_atoms, nbins, all_atomlist, num_cores):
     """Create images from ase atom objects. (multi process)"""
     fakeatoms_grid = get_fakeatoms_positioning_in_the_grid(ase_atoms, nbins)
+    # so slow...
     imageall_gen = Parallel(n_jobs=num_cores)(
         delayed(get_image_one_atom)(atom, fakeatoms_grid, nbins) for atom in ase_atoms)
     imageall_list = list(imageall_gen)
-    _, all_atomindex = get_all_atomlabel(all_atomlist)
+    all_atomlist = get_all_atomlabel(all_atomlist)
 
     channellist = []
     for i, atom in enumerate(ase_atoms):
-        channel = all_atomindex[atom.symbol]
-        channellist.append(channel)
+        channellist.append(atom.symbol)
 
-    channellist = list(set(channellist))
+    channellist = sorted(list(set(channellist)))
     nc = len(channellist)
     image = np.zeros((nbins, nbins, nbins, nc))
     for i, atom in enumerate(ase_atoms):
-        nnc = channellist.index(all_atomindex[atom.symbol])
+        nnc = channellist.index(atom.symbol)
         img_i = imageall_list[i]
         image[:, :, :, nnc] += img_i * (img_i >= 0.02)
 

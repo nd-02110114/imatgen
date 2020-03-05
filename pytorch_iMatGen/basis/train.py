@@ -1,5 +1,4 @@
 import json
-import h5py
 import argparse
 import torch
 import pandas as pd
@@ -17,13 +16,13 @@ from basis.loss import Reconstruction
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Training VAE for getting cell images')
+    parser = argparse.ArgumentParser(description='Training AE for basis images')
     # for data
-    parser.add_argument('--cif-path', default='dataset/data_2020_03_03.h5',
-                        type=str, help='path to cif data (relative path)')
-    parser.add_argument('--csv-path', default='dataset/data_2020_03_03.csv',
+    parser.add_argument('--data-path', default='dataset/preprocess/mp_dataset_2020_03',
+                        type=str, help='path to preprocessed data (relative path)')
+    parser.add_argument('--csv-path', default='dataset/raw/data_2020_03_03.csv',
                         type=str, help='path to csv data (relative path)')
-    parser.add_argument('--out-dir', '-o', default='result',
+    parser.add_argument('--out-dir', '-o', default='result/basis',
                         type=str, help='path for output directory')
     # usual setting
     parser.add_argument('--train-ratio', default=0.9, type=float,
@@ -67,16 +66,19 @@ def main():
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     # load raw dataset
-    cif_path = path.normpath(path.join(getcwd(), args.cif_path))
     csv_path = path.normpath(path.join(getcwd(), args.csv_path))
-    cif_data = h5py.File(cif_path, "r")
     table_data = pd.read_csv(csv_path, index_col=False)
+    mp_ids = table_data['material_id'].values
+    data_dir = path.normpath(path.join(getcwd(), args.data_path))
+    table = pd.read_csv(path.join(data_dir, 'basis_image.csv'))
+    mp_ids = list(set(table['mp_id'].values))
 
     # split
-    train_data, test_data = train_test_split(table_data, test_size=args.test_ratio, random_state=args.seed)
+    train_ids, test_ids = train_test_split(mp_ids, test_size=args.test_ratio, random_state=args.seed)
     # setup data loader
-    train_dataset = BasisImageDataset(cif_data, train_data)
-    test_dataset = BasisImageDataset(cif_data, test_data)
+    data_dir = path.normpath(path.join(getcwd(), args.data_path))
+    train_dataset = BasisImageDataset(train_ids, data_dir)
+    test_dataset = BasisImageDataset(test_ids, data_dir)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     valid_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
     loaders = {'train': train_loader, 'valid': valid_loader}

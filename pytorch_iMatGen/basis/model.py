@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -25,7 +26,7 @@ class Encoder(nn.Module):
         x = self.conv4(x)
         x = F.leaky_relu(x, self.leak_value)
         x = self.conv5(x)
-        x = F.tanh(x)
+        x = torch.tanh(x)
         return x
 
 
@@ -52,7 +53,7 @@ class Decoder(nn.Module):
         x = self.deconv4(x)
         x = F.leaky_relu(x, self.leak_value)
         x = self.deconv5(x)
-        x = F.sigmoid(x)
+        x = torch.sigmoid(x)
         return x
 
 

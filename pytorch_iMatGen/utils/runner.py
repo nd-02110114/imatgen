@@ -42,7 +42,11 @@ class AutoEncoderRunner:
 
             # log
             elapsed_time = time.time() - start_time
-            log_df[epoch, :] = [epoch + 1, avg_loss, avg_val_loss, score, elapsed_time]
+            log_df.iloc[epoch] = [epoch + 1, avg_loss, avg_val_loss, score, elapsed_time]
+
+            # the position of this depends on the scheduler you use
+            if scheduler is not None:
+                scheduler.step()
 
             # save best params
             save_path = 'best_model.pth'
@@ -83,9 +87,6 @@ class AutoEncoderRunner:
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            # the position of this depends on the scheduler you use
-            if scheduler is not None:
-                scheduler.step()
 
             # calc loss
             avg_loss += loss.item() / len(train_loader)

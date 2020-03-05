@@ -1,20 +1,9 @@
-import torch._tensor_docs
+import torch
 import functools
 import numpy as np
+import pandas as pd
+from os import path
 from torch.utils.data import Dataset
-from pymatgen.io.ase import AseAtomsAdaptor
-from pymatgen.core.structure import Structure
-
-
-from utils.preprocess import cell_translate, ase_atoms_to_image
-
-
-def cif_to_cell_image(position_info, nbins, all_atomlist, num_cores, fmt='cif'):
-    crystal = Structure.from_str(position_info, fmt)
-    ase_atoms = AseAtomsAdaptor.get_atoms(crystal)
-    translated_ase_atoms = cell_translate(ase_atoms)
-    image, channellist = ase_atoms_to_image(translated_ase_atoms, nbins, all_atomlist, num_cores)
-    return image
 
 
 class CellImageDataset(Dataset):
@@ -22,36 +11,22 @@ class CellImageDataset(Dataset):
     Wrapper for a dataset
     """
 
-    def __init__(self, cifs, table, transform=cif_to_cell_image,
-                 nbins=32, allatom_list=None, num_cores=-1, fmt='cif',
-                 random_seed=1234):
+    def __init__(self, mp_ids, data_dir):
         """
         Args:
-            # TODO: Consider about POSCAR case
-            cifs (HDF5): HDF5 object of cif data.
-            table (DataFrame): dataset with materials id and each property
-            transform (callable, optional): Optional transform to be applied on a sample.
-            nbins (int): number of bins in one dimension of image
-            allatom_list (list): element lists for data.
-            num_cores (int): number of process for loading data.
-            fmt (str): type of the structure informatio.n (cif or POSCAR)
-            random_seed (int): Random seed for shuffling the dataset.
+            mp_ids (List): materials ids for cell images
+            data_dir (string): path for preprocessed data
         """
-        self.mp_ids = table['material_id'].values
-        self.cifs = cifs
-        self.transform = transform
-        self.nbins = nbins
-        self.allatom_list = allatom_list
-        self.num_cores = num_cores
-        self.fmt = fmt
+        self.data_dir = data_dir
+        table = pd.read_csv(path.join(data_dir, 'cell_image.csv'))
+        self.table = table[table['mp_id'].isin(mp_ids)]
 
     def __len__(self):
-        return len(self.mp_ids)
+        return len(self.table)
 
     @functools.lru_cache(maxsize=None)  # Cache loaded structures
     def __getitem__(self, idx):
-        mp_id = self.mp_ids[idx]
-        image = self.transform(self.cifs[mp_id].value, self.nbins,
-                               self.allatom_list, self.num_cores, self.fmt)
+        image_name = self.table.iloc[idx]['image_name']
+        image = np.load(path.join(self.data_dir, 'cell_image', '{}.npy'.format(image_name)))
         image = np.transpose(image, (3, 0, 1, 2))
         return torch.tensor(image, dtype=torch.float)

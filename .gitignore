@@ -134,6 +134,7 @@ trained_model
 iMatGen-VO_dataset_generated_strctures.tar
 *.csv
 *.h5
+*.npy
 
 # for result
 result
