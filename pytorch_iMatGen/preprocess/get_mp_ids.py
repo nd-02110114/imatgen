@@ -38,7 +38,6 @@ def main():
     # load raw dataset
     csv_path = path.normpath(path.join(getcwd(), args.csv_path))
     table_data = pd.read_csv(csv_path, index_col=False)
-    table_data = table_data.iloc[0:20]
     structure_path = path.normpath(path.join(getcwd(), args.structure_path))
     structure_data = h5py.File(structure_path, "r")
 
