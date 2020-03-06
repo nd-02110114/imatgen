@@ -47,10 +47,14 @@ def main():
         crystal = Structure.from_str(structure_data[mp_id].value, args.fmt)
         n_sites = len(crystal.sites)
         max_lattice_length = max(crystal.lattice.lengths)
-        n_elements = len(Composition(formula).elements)
-        # https://github.com/kaist-amsg/imatgen/issues/2 + up to 5 elements
-        if n_sites <= 20 and max_lattice_length <= 10 and n_elements <= 5:
-            mp_ids += [mp_id]
+        if isinstance(formula, str):
+            crystal = Structure.from_str(structure_data[mp_id].value, args.fmt)
+            n_sites = len(crystal.sites)
+            max_lattice_length = max(crystal.lattice.lengths)
+            n_elements = len(Composition(formula).elements)
+            # https://github.com/kaist-amsg/imatgen/issues/2 + up to 5 elements
+            if n_sites <= 20 and max_lattice_length <= 10 and n_elements <= 5:
+                mp_ids += [mp_id]
 
     # save
     print('All MP ids : ', len(mp_ids))
