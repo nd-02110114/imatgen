@@ -20,6 +20,7 @@ class CellImageDataset(Dataset):
         self.data_dir = data_dir
         table = pd.read_csv(path.join(data_dir, 'cell_image.csv'))
         self.table = table[table['mp_id'].isin(mp_ids)]
+        assert set(mp_ids).issubset(list(table['mp_id'].values))
 
     def __len__(self):
         return len(self.table)

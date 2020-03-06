@@ -1,7 +1,7 @@
 import json
 import argparse
 import torch
-import pandas as pd
+import numpy as np
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from os import path, makedirs, getcwd
@@ -18,10 +18,8 @@ from cell.loss import Reconstruction
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Training AE for cell images')
     # for data
-    parser.add_argument('--data-path', default='../dataset/preprocess/mp_dataset_2020_03',
+    parser.add_argument('--data-path', default='../dataset/preprocess/mp_dataset_30000_2020_03',
                         type=str, help='path to preprocessed data (relative path)')
-    parser.add_argument('--csv-path', default='../dataset/raw/data_2020_03_03.csv',
-                        type=str, help='path to csv data (relative path)')
     parser.add_argument('--out-dir', '-o', default='result',
                         type=str, help='path for output directory')
     # usual setting
@@ -65,15 +63,13 @@ def main():
     seed_everything(args.seed)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    # load raw dataset
-    csv_path = path.normpath(path.join(getcwd(), args.csv_path))
-    table_data = pd.read_csv(csv_path, index_col=False)
-    mp_ids = table_data['material_id'].values
+    # load mp_ids
+    data_dir = path.normpath(path.join(getcwd(), args.data_path))
+    mp_ids = np.load(path.join(data_dir, 'mp_ids.npy'))
 
     # split
     train_ids, test_ids = train_test_split(mp_ids, test_size=args.test_ratio, random_state=args.seed)
     # setup data loader
-    data_dir = path.normpath(path.join(getcwd(), args.data_path))
     train_dataset = CellImageDataset(train_ids, data_dir)
     test_dataset = CellImageDataset(test_ids, data_dir)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)

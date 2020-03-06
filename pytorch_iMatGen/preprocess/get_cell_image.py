@@ -19,9 +19,9 @@ def parse_arguments():
                         type=str, help='path to cif data (relative path)')
     parser.add_argument('--csv-path', default='../dataset/raw/data_2020_03_03.csv',
                         type=str, help='path to csv data (relative path)')
-    parser.add_argument('--mp-ids', default='../dataset/preprocess/mp_dataset_2020_03/mp_ids.npy',
+    parser.add_argument('--mp-ids', default='../dataset/preprocess/mp_dataset_30000_2020_03/mp_ids.npy',
                         type=str, help='path to mp ids data (relative path)')
-    parser.add_argument('--out-dir', '-o', default='../dataset/preprocess/mp_dataset_2020_03',
+    parser.add_argument('--out-dir', '-o', default='../dataset/preprocess/mp_dataset_30000_2020_03',
                         type=str, help='path for output directory')
 
     parser.add_argument('--fmt', default='cif',
@@ -51,8 +51,8 @@ def main():
     structure_data = h5py.File(structure_path, "r")
     table_data = pd.read_csv(csv_path, index_col=False)
     mp_ids = np.load(mp_ids_path)
-    print(len(mp_ids))
     table_data = table_data[table_data['material_id'].isin(mp_ids)]
+    assert len(mp_ids) == len(table_data)
 
     # loop
     cell_nbins = 32
