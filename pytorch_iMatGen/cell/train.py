@@ -99,7 +99,7 @@ def main():
     out_encode_dir_path = path.join(data_dir, 'cell_image_encode')
     makedirs(out_encode_dir_path, exist_ok=True)
     for pred, image_name in zip(preds, image_names):
-        encode_name = '{}_{}.npy'.format(image_name, 'encode')
+        encode_name = '{}.npy'.format(image_name)
         save_path = path.join(out_encode_dir_path, encode_name)
         np.save(save_path, pred)
 

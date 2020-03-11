@@ -90,6 +90,7 @@ def initialiseWeights():
 	global weights
 	xavier_init = tf.contrib.layers.xavier_initializer()
 
+	# filter_height, filter_width, in_channels, out_channels
 	weights['we1'] = tf.get_variable("we1", shape=[1, 4, 6, 100], initializer=xavier_init)
 	weights['we2'] = tf.get_variable("we2", shape=[1, 4, 100, 100], initializer=xavier_init)
 	weights['we3'] = tf.get_variable("we3", shape=[1, 4, 100, 100], initializer=xavier_init)
@@ -119,6 +120,7 @@ def trainGAN(loadmodel,model_checkpoint):
   # Weights for autoencoder pretraining
 	xavier_init = tf.contrib.layers.xavier_initializer()
 
+  # batch, in_height=1, in_width=200, in_channels=6
 	x_cell = tf.concat([x_vector,cell_vector],3)
 
 	with tf.variable_scope('encoders') as scope1:
