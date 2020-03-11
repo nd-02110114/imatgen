@@ -26,8 +26,8 @@ class Encoder(nn.Module):
         x = F.leaky_relu(x, self.leak_value)
         x = self.flatten(x)
         x = self.fc(x)
-        mean, var = torch.split(x, int(x.size(1)/2), dim=1)
-        return mean, var
+        mean, log_var = torch.split(x, int(x.size(1)/2), dim=1)
+        return mean, log_var
 
 
 class Decoder(nn.Module):
@@ -42,7 +42,6 @@ class Decoder(nn.Module):
         self.deconv4 = nn.ConvTranspose2d(100, 6, (1, 4), stride=(1, 2), padding=(0, 1))
 
     def forward(self, x):
-        print(x.shape)
         x = self.fc(x)
         x = F.leaky_relu(x, self.leak_value)
         # channel, height, width = (50, 1, 25)
@@ -81,10 +80,10 @@ class MaterialGenerator(nn.Module):
         self.classifier = FormationEnergyClassifier(z_size)
 
     def sampling(self, x):
-        mean, var = self.encoder(x)
+        mean, log_var = self.encoder(x)
         epsilon = torch.randn(mean.shape).to(mean.device)
-        z = mean + torch.sqrt(var) * epsilon
-        return z, mean, var
+        z = mean + torch.exp(log_var / 2) * epsilon
+        return z, mean, log_var
 
     def decode(self, z):
         y = self.decoder(z)

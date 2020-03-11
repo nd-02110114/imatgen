@@ -161,6 +161,7 @@ class MaterialsGeneratorRunner:
             gc.collect()
             # train for one epoch
             avg_loss = self._train_model(model, criterion, optimizer, train_loader, scheduler)
+            print(avg_loss)
             # evaluate on validation set
             avg_val_loss, score = self._validate_model(model, criterion, valid_loader, score_func)
 
@@ -209,10 +210,10 @@ class MaterialsGeneratorRunner:
             labels = labels.to(self.device)
 
             # training
-            z, mean, var = model.sampling(images)
+            z, mean, log_var = model.sampling(images)
             output = model.decode(z)
             logits = model.classify(z)
-            loss = criterion(output, images, mean, var, logits, labels)
+            loss = criterion(output, images, mean, log_var, logits, labels)
 
             # update params
             optimizer.zero_grad()

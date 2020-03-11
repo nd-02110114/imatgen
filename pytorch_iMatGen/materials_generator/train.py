@@ -32,8 +32,8 @@ def parse_arguments():
 
     # for model
     parser.add_argument('--z-size', default=500, type=int, help='size for latent variable (500)')
-    parser.add_argument('--reg-kl', default=1e-6, type=int, help='coefficient for KL divergence')
-    parser.add_argument('--reg-classify', default=0, type=int, help='coefficient for classify loss')
+    parser.add_argument('--reg-kl', default=1e-6, type=float, help='coefficient for KL divergence')
+    parser.add_argument('--reg-classify', default=0, type=float, help='coefficient for classify loss')
 
     # for learning
     parser.add_argument('--gpu', '-g', action='store_true',
