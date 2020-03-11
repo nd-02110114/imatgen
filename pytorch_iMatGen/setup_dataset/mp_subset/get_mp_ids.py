@@ -10,13 +10,13 @@ from pymatgen.core.structure import Structure
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Getting basis images')
+    parser = argparse.ArgumentParser(description='Get valid mp ids')
     # for data
-    parser.add_argument('--structure-path', default='../dataset/raw/data_2020_03_03.h5',
+    parser.add_argument('--structure-path', default='../../dataset/raw/data_2020_03_03.h5',
                         type=str, help='path to cif data (relative path)')
-    parser.add_argument('--csv-path', default='../dataset/raw/data_2020_03_03.csv',
+    parser.add_argument('--csv-path', default='../../dataset/raw/data_2020_03_03.csv',
                         type=str, help='path to csv data (relative path)')
-    parser.add_argument('--out-dir', '-o', default='../dataset/preprocess/mp_dataset_30000_2020_03',
+    parser.add_argument('--out-dir', '-o', default='../../dataset/preprocess/mp_dataset_30000_2020_03',
                         type=str, help='path for output directory')
     parser.add_argument('--fmt', default='cif',
                         type=str, help='format for structure data')
