@@ -71,6 +71,26 @@ class AutoEncoderRunner:
 
         return True
 
+    def predict_loader(self, model, loader, resume='best_model.pth'):
+        # switch to eval mode
+        model = model.to(self.device)
+        model.load_state_dict(torch.load(resume))
+        model.eval()
+        preds = []
+        image_names = []
+        with torch.no_grad():
+            for idx, batch in tqdm(enumerate(loader), total=len(loader)):
+                images, image_name = batch
+                images = images.to(self.device)
+
+                # output
+                output = model.encoder(images)
+                output = output.detach().cpu().numpy().reshape(images.size(0), -1)
+                preds.extend(output)
+                image_names.extend(image_name)
+
+        return preds, image_names
+
     def _train_model(self, model, criterion, optimizer, train_loader, scheduler=None):
         # switch to train mode
         model.train()

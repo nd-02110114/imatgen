@@ -89,6 +89,20 @@ def main():
     runner.train(model=model, criterion=criterion, optimizer=optimizer, scheduler=scheduler,
                  loaders=loaders, logdir=args.out_dir, num_epochs=args.epochs)
 
+    # encoding
+    all_dataset = CellImageDataset(mp_ids, data_dir, encode=True)
+    all_loader = DataLoader(all_dataset, batch_size=args.batch_size, shuffle=False)
+    resume = path.join(args.out_dir, 'best_model.pth')
+    preds, image_names = runner.predict_loader(model, all_loader, resume)
+
+    # save encoded cell image
+    out_encode_dir_path = path.join(data_dir, 'cell_image_encode')
+    makedirs(out_encode_dir_path, exist_ok=True)
+    for pred, image_name in zip(preds, image_names):
+        encode_name = '{}_{}.npy'.format(image_name, 'encode')
+        save_path = path.join(out_encode_dir_path, encode_name)
+        np.save(save_path, pred)
+
 
 if __name__ == '__main__':
     main()
