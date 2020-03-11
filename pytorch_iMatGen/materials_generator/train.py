@@ -38,12 +38,12 @@ def parse_arguments():
     # for learning
     parser.add_argument('--gpu', '-g', action='store_true',
                         help='using gpu during training')
-    parser.add_argument('--epochs', '-e', default=21, type=int,
-                        help='number of total epochs to run (21)')
+    parser.add_argument('--epochs', '-e', default=201, type=int,
+                        help='number of total epochs to run (201)')
     parser.add_argument('--batch-size', '-b', default=64, type=int,
                         help='mini-batch size (64)')
-    parser.add_argument('--learning-rate', '-lr', default=0.003, type=float,
-                        help='initial learning rate (default: 0.003')
+    parser.add_argument('--learning-rate', '-lr', default=0.0001, type=float,
+                        help='initial learning rate (default: 0.0001')
     parser.add_argument('--optim', choices=['SGD', 'Adam'], default='Adam',
                         help='choose an optimizer, SGD or Adam, (default: Adam)')
     parser.add_argument('--seed', default=1234, type=int, help='seed value (default: 1234)')
