@@ -47,7 +47,7 @@ class MaterialsGeneratorDataset(Dataset):
         vector = np.concatenate([basis_vector, cell_vector], axis=0)
         # add a new axis
         vector = vector.reshape((1, 6, 200))
-        # reshape channel, height, width = (6, 1, 200)
+        # reshape (channel, height, width) = (6, 1, 200)
         vector = np.transpose(vector, (1, 0, 2))
 
         # for formation energy task

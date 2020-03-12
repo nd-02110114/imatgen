@@ -40,6 +40,7 @@ class Decoder(nn.Module):
         self.deconv4 = nn.ConvTranspose3d(64, 1, kernel_size, stride=(2, 2, 2), padding=(1, 1, 1))
 
     def forward(self, x):
+        x = x.view(-1, self.z_size, 1, 1, 1)
         x = self.deconv1(x)
         x = F.leaky_relu(x, self.leak_value)
         x = self.deconv2(x)
@@ -54,14 +55,10 @@ class Decoder(nn.Module):
 class CellAutoEncoder(nn.Module):
     def __init__(self, z_size=20, leak_value=0.2):
         super(CellAutoEncoder, self).__init__()
-        self.z_size = z_size
-        self.leak_value = leak_value
         self.encoder = Encoder(z_size, leak_value)
         self.decoder = Decoder(z_size, leak_value)
 
     def forward(self, x):
         x = self.encoder(x)
-        # reshape
-        x = x.view(-1, self.z_size, 1, 1, 1)
         x = self.decoder(x)
         return x

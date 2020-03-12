@@ -161,7 +161,6 @@ class MaterialsGeneratorRunner:
             gc.collect()
             # train for one epoch
             avg_loss = self._train_model(model, criterion, optimizer, train_loader, scheduler)
-            print(avg_loss)
             # evaluate on validation set
             avg_val_loss, score = self._validate_model(model, criterion, valid_loader, score_func)
 
@@ -194,10 +193,6 @@ class MaterialsGeneratorRunner:
             # save log
             log_df.to_csv(os.path.join(logdir, 'log.csv'))
 
-        return True
-
-    def predict_loader(self, model, loader, resume='best_model.pth'):
-        # TODO
         return True
 
     def _train_model(self, model, criterion, optimizer, train_loader, scheduler=None):

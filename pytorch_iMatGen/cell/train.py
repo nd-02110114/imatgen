@@ -34,8 +34,8 @@ def parse_arguments():
     # for learning
     parser.add_argument('--gpu', '-g', action='store_true',
                         help='using gpu during training')
-    parser.add_argument('--epochs', '-e', default=21, type=int,
-                        help='number of total epochs to run (21)')
+    parser.add_argument('--epochs', '-e', default=20, type=int,
+                        help='number of total epochs to run (20)')
     parser.add_argument('--batch-size', '-b', default=32, type=int,
                         help='mini-batch size (32)')
     parser.add_argument('--learning-rate', '-lr', default=0.0001, type=float,
@@ -76,7 +76,6 @@ def main():
     valid_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
     loaders = {'train': train_loader, 'valid': valid_loader}
 
-    # train
     model = CellAutoEncoder(z_size=args.z_size)
     model = model.to(device)
     optimizer = Adam(model.parameters(), lr=args.learning_rate)
