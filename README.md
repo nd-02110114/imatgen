@@ -1,11 +1,7 @@
-# iMatGen reproduce
+# Pytorch iMatGen
 
-## Repository details
-
-```
-├── iMatGen/                           # original implementation
-└── pytorch_iMatGen/                   # my implementation (pytorch)
-```
+Pytorch implementation for "Inverse Design of Solid-State Materials via a Continuous Representation"  
+Original implementation : https://github.com/kaist-amsg/imatgen
 
 ## Setup
 

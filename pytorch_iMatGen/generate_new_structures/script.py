@@ -34,8 +34,8 @@ def parse_arguments():
     parser.add_argument('--sampling-size', default=10000, type=int, help='using gpu during training')
     parser.add_argument('--sampling', choices=['random', 'slerp'], default='random',
                         help='choose sampling method, (default: random)')
-    parser.add_argument('--batch-size', '-b', default=64, type=int,
-                        help='mini-batch size (64)')
+    parser.add_argument('--batch-size', '-b', default=8, type=int,
+                        help='mini-batch size (8)')
     parser.add_argument('--seed', default=1234, type=int, help='seed value (default: 1234)')
 
     return parser.parse_args()
