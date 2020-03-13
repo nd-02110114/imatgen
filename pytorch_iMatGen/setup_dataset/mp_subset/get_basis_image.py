@@ -13,7 +13,7 @@ from utils.preprocess import basis_translate, ase_atoms_to_image
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Create basis images')
-    # for data
+
     parser.add_argument('--structure-path', default='../../dataset/raw/data_2020_03_03.h5',
                         type=str, help='path to cif data (relative path)')
     parser.add_argument('--csv-path', default='../../dataset/raw/data_2020_03_03.csv',
@@ -53,7 +53,6 @@ def main():
     table_data = table_data[table_data['material_id'].isin(mp_ids)]
     assert len(mp_ids) == len(table_data)
 
-    # loop
     basis_nbins = 64
     # 余分に領域を確保しておく
     length = len(table_data['material_id'].values) * 5

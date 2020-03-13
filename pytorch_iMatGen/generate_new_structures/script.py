@@ -81,7 +81,7 @@ def main():
     # generate
     structure_generator = StructureGenerator(device, args.cell_z_size, args.basis_z_size, args.z_size)
     structure_generator.load_pretrained_weight(cell_ae_path, basis_ae_path, materials_generator_path)
-    structure_generator.generate(loader)
+    structure_generator.generate(loader, out_dir_path)
 
 
 if __name__ == '__main__':

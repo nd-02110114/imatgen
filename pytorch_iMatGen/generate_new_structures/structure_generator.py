@@ -1,10 +1,13 @@
 import torch
 import torch.nn as nn
 from tqdm import tqdm
+from os import path
+
 
 from materials_generator.model import MaterialGenerator
 from cell.model import CellAutoEncoder
 from basis.model import BasisAutoEncoder
+from utils.postprocess import image_to_cell, image_to_basis, save_basis_and_cell
 
 
 class StructureGenerator(nn.Module):
@@ -25,10 +28,8 @@ class StructureGenerator(nn.Module):
         self.basis_ae.eval()
         self.materials_generator.load_state_dict(torch.load(materials_generator_path))
         self.materials_generator.eval()
-        return True
 
-    def generate(self, loader):
-        preds = []
+    def generate(self, loader, log_dir):
         with torch.no_grad():
             for idx, batch in tqdm(enumerate(loader), total=len(loader)):
                 sampling_z = batch[0]
@@ -44,9 +45,21 @@ class StructureGenerator(nn.Module):
                 # create basis image
                 basis_z = out[:, 0:5, :]
                 basis_image = self.basis_ae.decoder(basis_z.reshape(-1, self.basis_z_size))
-                basis_image = basis_image.reshape(-1, 5, 64, 64, 64).detach().cpu().numpy()
+                basis_image = basis_image.detach().cpu().numpy()
 
                 # postprocess
-                # TODO:
-
-        return preds
+                batch_size = cell_image.shape[0]
+                # TODO
+                elements = ['H', 'H', 'H', 'H', 'H']
+                for i in range(batch_size):
+                    try:
+                        cell_atom = image_to_cell(cell_image[i])
+                        basis_atoms = [
+                            image_to_basis(val, elements[i])
+                            for i, val in enumerate(basis_image[i*5:(i+1)*5])
+                        ]
+                        print(basis_atoms)
+                        save_path = path.join(log_dir, 'sampling_{}.cif'.format(idx * batch_size + i))
+                        save_basis_and_cell(cell_atom, basis_atoms, save_path)
+                    except:  # noqa
+                        pass

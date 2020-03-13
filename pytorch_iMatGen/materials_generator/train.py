@@ -73,7 +73,7 @@ def main():
     mp_ids = np.load(path.join(data_dir, 'mp_ids.npy'))
 
     # split
-    train_ids, test_ids = train_test_split(mp_ids, test_size=args.test_ratio, random_state=args.seed)
+    train_ids, test_ids = train_test_split(mp_ids, test_size=args.test_ratio)
     # setup data loader
     train_dataset = MaterialsGeneratorDataset(train_ids, data_dir, raw_data_dir)
     test_dataset = MaterialsGeneratorDataset(test_ids, data_dir, raw_data_dir)

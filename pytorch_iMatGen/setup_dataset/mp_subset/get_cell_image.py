@@ -14,7 +14,7 @@ from utils.preprocess import cell_translate, ase_atoms_to_image
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Create cell images')
-    # for data
+
     parser.add_argument('--structure-path', default='../../dataset/raw/data_2020_03_03.h5',
                         type=str, help='path to cif data (relative path)')
     parser.add_argument('--csv-path', default='../../dataset/raw/data_2020_03_03.csv',
@@ -54,7 +54,6 @@ def main():
     table_data = table_data[table_data['material_id'].isin(mp_ids)]
     assert len(mp_ids) == len(table_data)
 
-    # loop
     cell_nbins = 32
     length = len(table_data['material_id'].values)
     cell_csv = pd.DataFrame([], columns=['mp_id', 'crystal_system', 'space_group', 'image_name'],

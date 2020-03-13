@@ -4,14 +4,17 @@ import argparse
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from os import environ, path, makedirs, getcwd
+from os import path, makedirs, getcwd
 from pymatgen.core.composition import Composition
 from pymatgen.core.structure import Structure
 
 
+from utils.seed import seed_everything
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Get valid mp ids')
-    # for data
+
     parser.add_argument('--structure-path', default='../../dataset/raw/data_2020_03_03.h5',
                         type=str, help='path to cif data (relative path)')
     parser.add_argument('--csv-path', default='../../dataset/raw/data_2020_03_03.csv',
@@ -60,9 +63,7 @@ def main():
     print('All MP ids : ', len(mp_ids))
     mp_ids = np.array(mp_ids)
     if len(mp_ids) > args.size:
-        seed = 1234
-        random.seed(seed)
-        environ['PYTHONHASHSEED'] = str(seed)
+        seed_everything(seed=1234)
         index = random.sample([i for i in range(len(mp_ids))], args.size)
         mp_ids = mp_ids[index]
     save_path = path.join(out_dir, 'mp_ids.npy')

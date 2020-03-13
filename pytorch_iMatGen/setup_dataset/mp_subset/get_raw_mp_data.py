@@ -1,5 +1,3 @@
-# load data from mp
-
 import argparse
 from os import path, makedirs, getcwd
 from datetime import datetime
@@ -10,8 +8,8 @@ from pymatgen import MPRester
 
 
 def parse_arguments():
-    # Set up the argument parser.
     parser = argparse.ArgumentParser(description='Download mp dataset')
+
     parser.add_argument('--out', '-o', type=str, default='../../dataset/raw',
                         help='directory path to save the data')
     parser.add_argument('--name', '-n', type=str, default='data',
@@ -22,6 +20,7 @@ def parse_arguments():
 if __name__ == '__main__':
     # Parse the arguments.
     args = parse_arguments()
+
     # create save path
     target_dir = args.out
     out_dir_path = path.normpath(path.join(getcwd(), target_dir))
@@ -68,7 +67,7 @@ if __name__ == '__main__':
     # collect all data
     data = mp_dr.query(criteria=criteria, properties=properties)
 
-    # save structure data
+    # save property data
     list_data = [list(dict_val.values())[:-1] for dict_val in data]
     df = pd.DataFrame(list_data, columns=properties[:-1])
     df.to_csv(out_csv_path)
