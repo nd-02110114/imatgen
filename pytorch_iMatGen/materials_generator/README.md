@@ -1,7 +1,8 @@
 # Scripts for training materials generator
 
 ## Usage
-Please set the YYYY_MM_DD which the data was created on.
+
+Please set the `YYYY_MM_DD` which the data was created on.
 
 ```
 $ PYTOHNPATH=.. python train.py \

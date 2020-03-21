@@ -1,7 +1,8 @@
 # Scripts for preparing MP subset data
 
 ## Usage
-Please set the YYYY_MM_DD which the data was created on.
+
+Please set the `YYYY_MM_DD` which the data was created on.
 
 ### 1. Load raw mp data
 
@@ -19,7 +20,7 @@ $ PYTHONPATH=../.. python get_mp_ids.py --structure-path ../../dataset/raw/data_
 
 ### 3. Create Cell and Basis images
 
-**Caution** : Basis images requires a large file volume
+**Caution** : Basis images requires a large file volume.
 
 ```
 $ PYTHONPATH=../.. python get_cell_image.py --structure-path ../../dataset/raw/data_YYYY_MM_DD.h5 \

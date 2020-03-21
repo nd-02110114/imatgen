@@ -31,7 +31,7 @@ if __name__ == '__main__':
     out_h5_path = path.join(out_dir_path, filename + "_" + time + ".h5")
 
     # initialize MPRester
-    MP_KEY = ''
+    MP_KEY = 'cRelC34nhXp1wf5H'
     mp_dr = MPRester(MP_KEY)
 
     # query
